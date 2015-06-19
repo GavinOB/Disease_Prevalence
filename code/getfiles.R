@@ -40,3 +40,6 @@ for (i in 1:nrow(towns)) {
   match.rate <- as.integer(gsub(",", "", match.rate))
   towns[i, "HIV.rate"] <- match.rate
 }
+
+# Save data to CSV file
+write.csv(towns[, c(1, 3)], file = "data/prevalence_rates.csv", row.names = FALSE)
