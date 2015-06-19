@@ -28,4 +28,15 @@ for (i in 1:length(get.list)) {
 }
 
 # Create data frame of filenames and town names
-towns <- data.frame(town = doc.towns, file = rtf.base)
+towns <- data.frame(town = doc.towns, file = rtf.base, HIV.rate = NA)
+
+# Scrape RTF files for prevalence rates and add to "town" data frame
+for (i in 1:nrow(towns)) {
+  lines <- readLines(paste(dest.loc, towns[i, "file"], sep = ""))
+  lines <- lines[lines != ""]
+  match <- grep(".*HIV\\/AIDS Prevalence.*", lines)
+  match.result <- lines[match + 1]
+  match.rate <- gsub(".*\\\\\\~.(.*?)\\\\cell.*", "\\1", match.result)
+  match.rate <- as.integer(gsub(",", "", match.rate))
+  towns[i, "HIV.rate"] <- match.rate
+}
