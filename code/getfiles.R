@@ -1,19 +1,21 @@
 library(XML) # HTML processing
 options(stringsAsFactors = FALSE)
 
-# Base URL
+# Set location variables
 source.url <- "http://www.mass.gov/eohhs/researcher/community-health/masschip/health-status-indicators.html"
 base.url <- "http://www.mass.gov"
 dest.loc <- "data/"
   
-# Read HTML file, extract RTF link name
+# Read HTML file
 doc.html <- htmlParse(source.url)
-doc.links <- xpathSApply(doc.html, "//a/@href")
-doc.towns <- doc.html["//a[contains(@href,'hsicity')]"]
-doc.towns <- sapply(doc.towns, xmlValue)
-doc.towns <- doc.towns[doc.towns != ""]
-rtf.url <- as.character(doc.links[grep(".*hsicity.*rtf", doc.links)])
 
+# Scrape links and town names
+doc.links <- xpathSApply(doc.html, "//a[@class='titlelink']/@href")
+rtf.url <- as.character(doc.links[grep(".*hsicity.*rtf", doc.links)])
+doc.towns <- xpathSApply(doc.html, "//a[@href[contains(., 'hsicity')] and @class='titlelink']", xmlValue)
+doc.towns <- gsub(" \\(RTF\\)", "", doc.towns)
+
+# Assemble URLs to download documents
 rtf.base <- basename(rtf.url)
 get.list <- paste(base.url, rtf.url, sep = "")
 
@@ -24,3 +26,20 @@ for (i in 1:length(get.list)) {
     download.file(get.list[i], dest.file)
     }
 }
+
+# Create data frame of filenames and town names
+towns <- data.frame(town = doc.towns, file = rtf.base, HIV.rate = NA)
+
+# Scrape RTF files for prevalence rates and add to "town" data frame
+for (i in 1:nrow(towns)) {
+  lines <- readLines(paste(dest.loc, towns[i, "file"], sep = ""))
+  lines <- lines[lines != ""]
+  match <- grep(".*HIV\\/AIDS Prevalence.*", lines)
+  match.result <- lines[match + 1]
+  match.rate <- gsub(".*\\\\\\~.(.*?)\\\\cell.*", "\\1", match.result)
+  match.rate <- as.integer(gsub(",", "", match.rate))
+  towns[i, "HIV.rate"] <- match.rate
+}
+
+# Save data to CSV file
+write.csv(towns[, c(1, 3)], file = "data/prevalence_rates.csv", row.names = FALSE)
