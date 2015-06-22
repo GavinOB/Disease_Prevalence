@@ -36,8 +36,11 @@ for (i in 1:nrow(towns)) {
   lines <- lines[lines != ""]
   match <- grep(".*HIV\\/AIDS Prevalence.*", lines)
   match.result <- lines[match + 1]
-  match.rate <- gsub(".*\\\\\\~.(.*?)\\\\cell.*", "\\1", match.result)
-  match.rate <- as.integer(gsub(",", "", match.rate))
+  match.number <- gsub(".*\\\\\\~.(.*?)\\\\cell.*", "\\1", match.result)
+  match.rate <-   gsub(".*\\\\\\~.*\\\\cell.(.*?)\\\\cell.*", "\\1", match.result)
+  match.number <- as.integer(gsub(",", "", match.number))
+  match.rate <- as.numeric(gsub(",", "", match.rate))
+  towns[i, "HIV.number"] <- match.number
   towns[i, "HIV.rate"] <- match.rate
 }
 
