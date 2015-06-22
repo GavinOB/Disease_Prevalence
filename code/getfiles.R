@@ -9,7 +9,11 @@ dest.loc <- "data/"
 # Read HTML file, extract RTF link name
 doc.html <- htmlParse(source.url)
 doc.links <- xpathSApply(doc.html, "//a/@href")
+doc.towns <- doc.html["//a[contains(@href,'hsicity')]"]
+doc.towns <- sapply(doc.towns, xmlValue)
+doc.towns <- doc.towns[doc.towns != ""]
 rtf.url <- as.character(doc.links[grep(".*hsicity.*rtf", doc.links)])
+
 rtf.base <- basename(rtf.url)
 get.list <- paste(base.url, rtf.url, sep = "")
 
