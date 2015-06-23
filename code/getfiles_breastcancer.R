@@ -2,7 +2,7 @@ library(XML) # HTML processing
 options(stringsAsFactors = FALSE)
 
 # Set location variables
-source.url <- "http://www.mass.gov/eohhs/researcher/community-health/masschip/health-status-indicators.html"
+source.url <- "http://www.mass.gov/eohhs/researcher/community-health/masschip/breast-cancer.html"
 base.url <- "http://www.mass.gov"
 dest.loc <- "data/"
   
@@ -11,8 +11,8 @@ doc.html <- htmlParse(source.url)
 
 # Scrape links and town names
 doc.links <- xpathSApply(doc.html, "//a[@class='titlelink']/@href")
-rtf.url <- as.character(doc.links[grep(".*hsicity.*rtf", doc.links)])
-doc.towns <- xpathSApply(doc.html, "//a[@href[contains(., 'hsicity')] and @class='titlelink']", xmlValue)
+rtf.url <- as.character(doc.links[grep(".*cancerbreastcity.*rtf", doc.links)])
+doc.towns <- xpathSApply(doc.html, "//a[@href[contains(., 'cancerbreastcity')] and @class='titlelink']", xmlValue)
 doc.towns <- gsub(" \\(RTF\\)", "", doc.towns)
 
 # Assemble URLs to download documents
@@ -23,26 +23,27 @@ get.list <- paste(base.url, rtf.url, sep = "")
 for (i in 1:length(get.list)) {
   dest.file <- paste(dest.loc, rtf.base[i], sep = "")
   if (!file.exists(dest.file)) {
+    Sys.sleep(2)
     download.file(get.list[i], dest.file)
     }
 }
 
 # Create data frame of filenames and town names
-towns <- data.frame(town = doc.towns, file = rtf.base, HIV.rate = NA)
+towns.cancer <- data.frame(town = doc.towns, file = rtf.base, cancer.rate = NA)
 
 # Scrape RTF files for prevalence rates and add to "town" data frame
-for (i in 1:nrow(towns)) {
-  lines <- readLines(paste(dest.loc, towns[i, "file"], sep = ""))
+for (i in 1:nrow(towns.cancer)) {
+  lines <- readLines(paste(dest.loc, towns.cancer[i, "file"], sep = ""))
   lines <- lines[lines != ""]
-  match <- grep(".*HIV\\/AIDS Prevalence.*", lines)
-  match.result <- lines[match + 1]
-  match.number <- gsub(".*\\\\\\~.(.*?)\\\\cell.*", "\\1", match.result)
-  match.rate <-   gsub(".*\\\\\\~.*\\\\cell.(.*?)\\\\cell.*", "\\1", match.result)
+  match <- grep(".*Total Breast Cancer Incidence.*", lines)
+  match.result <- lines[match]
+  match.number <- gsub(".*\\\\\\~.*\\\\\\~(.*?)\\\\cell.*", "\\1", match.result)
+  match.rate <-   gsub(".*cell \\\\\\~(.*?)\\\\cell.*", "\\1", match.result)
   match.number <- as.integer(gsub(",", "", match.number))
   match.rate <- as.numeric(gsub(",", "", match.rate))
-  towns[i, "HIV.number"] <- match.number
-  towns[i, "HIV.rate"] <- match.rate
+  towns.cancer[i, "breast.cancer.number"] <- match.number
+  towns.cancer[i, "breast.cancer.rate"] <- match.rate
 }
 
 # Save data to CSV file
-write.csv(towns[, c(1, 3)], file = "data/prevalence_rates.csv", row.names = FALSE)
+write.csv(towns.cancer[, c(1, 3)], file = "data/breastcancer_prevalence_rates.csv", row.names = FALSE)
