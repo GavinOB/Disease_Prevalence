@@ -46,4 +46,4 @@ for (i in 1:nrow(towns.cancer)) {
 }
 
 # Save data to CSV file
-write.csv(towns.cancer[, c(1, 3)], file = "data/breastcancer_prevalence_rates.csv", row.names = FALSE)
+# write.csv(towns.cancer[, c(1, 3)], file = "data/breastcancer_prevalence_rates.csv", row.names = FALSE)

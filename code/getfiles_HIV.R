@@ -46,5 +46,4 @@ for (i in 1:nrow(towns.hiv)) {
 }
 
 # Save data to CSV file
-save(towns.hi)
-write.csv(towns.hiv[, c(1, 3)], file = "data/HIV_prevalence_rates.csv", row.names = FALSE)
+# write.csv(towns.hiv[, c(1, 3)], file = "data/HIV_prevalence_rates.csv", row.names = FALSE)
