@@ -1,13 +1,16 @@
 ---
-title: "Disease Prevalence"
-author: "Gavin O'Brien"
-date: "June 23, 2015"
-output: 
-  html_document:
-    theme: "cerulean"
+title: "Disease Rates"
+output: html_document
 ---
 
-```{r}
+```{r global_options, include=FALSE}
+knitr::opts_chunk$set(fig.width = 10, fig.height = 50, fig.path = 'figs/', echo = FALSE, warning = FALSE)
+```
+
+```{r load_data}
+library(reshape2)
+library(ggplot2)
+
 datafile <- "data/prevalence.RData"
  if (file.exists(datafile)) {
   load(datafile)
@@ -16,12 +19,47 @@ datafile <- "data/prevalence.RData"
   source("code/getfiles_HIV.R")
   source("code/poverty.R")
  }
+
+melted <- melt(town.rates[, c(1, 2, 4, 6)], id.vars = "town")
+melted$town <- factor(melted$town)
+melted$town <- factor(melted$town, levels = rev(levels(melted$town)), ordered = TRUE)
+
+plots <- function(z) {
+  ggplot(z, aes(x = town, y = value, fill = value, label = round(value, 0))) + 
+    geom_bar(stat = "identity") + 
+    coord_flip() +
+    guides(fill = FALSE) +
+    geom_text(size = 3.5, hjust = -0.3) +
+    labs(y = "rate")
+}
 ```
 
-```{r state.rates, results = 'asis'}
-knitr::kable(state.rates)
+### Breast Cancer
+
+Incident Rate per 100,000 People
+
+Source: http://www.mass.gov/eohhs/researcher/community-health/masschip/breast-cancer.html
+
+```{r breast_cancer}
+plots(melted[melted$variable == "breast.cancer.rate", ])
 ```
 
-```{r town.rates, results = 'asis'}
-knitr::kable(town.rates)
+### HIV/AIDS
+
+Prevalence Rate per 100,000 People
+
+Source: http://www.mass.gov/eohhs/researcher/community-health/masschip/health-status-indicators.html
+
+```{r hiv}
+plots(melted[melted$variable == "HIV.rate", ])
+```
+
+### Poverty
+
+Percent Below Federal Poverty Level
+
+Source: http://factfinder.census.gov/bkmk/table/1.0/en/ACS/13_5YR/GCT1701.US13PR/0100000US
+
+```{r poverty}
+plots(melted[melted$variable == "poverty.rate", ])
 ```
