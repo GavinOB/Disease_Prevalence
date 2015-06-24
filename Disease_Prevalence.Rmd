@@ -1,0 +1,27 @@
+---
+title: "Disease Prevalence"
+author: "Gavin O'Brien"
+date: "June 23, 2015"
+output: 
+  html_document:
+    theme: "cerulean"
+---
+
+```{r}
+datafile <- "data/prevalence.RData"
+ if (file.exists(datafile)) {
+  load(datafile)
+ } else {
+  source("code/getfiles_breastcancer.R")
+  source("code/getfiles_HIV.R")
+  source("code/poverty.R")
+ }
+```
+
+```{r state.rates, results = 'asis'}
+knitr::kable(state.rates)
+```
+
+```{r town.rates, results = 'asis'}
+knitr::kable(town.rates)
+```
