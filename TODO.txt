@@ -1,6 +1,6 @@
 TODO
 
-* add census data source to README
+* table of results (R markdown)
 * source of Mass towns shapefile
 * save data and load if exists
 * get state-wide numbers for each measure

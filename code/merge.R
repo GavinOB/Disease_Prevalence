@@ -9,6 +9,6 @@ state.rates <- read.table(header = TRUE, text = "
                    'Poverty' 11.4
                    ")
 
-if (!file.exists("data/prevalence.Rda")) {
-  save(town.rates, state.rates, file = "data/prevalence.Rda")
+if (!file.exists("data/prevalence.RData")) {
+  save(town.rates, state.rates, file = "data/prevalence.RData")
 }

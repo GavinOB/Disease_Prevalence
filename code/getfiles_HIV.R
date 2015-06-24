@@ -33,7 +33,7 @@ towns.hiv <- data.frame(town = doc.towns, file = rtf.base, HIV.rate = NA)
 
 # Scrape RTF files for prevalence rates and add to "town" data frame
 for (i in 1:nrow(towns.hiv)) {
-  lines <- readLines(paste(dest.loc, towns[i, "file"], sep = ""))
+  lines <- readLines(paste(dest.loc, towns.hiv[i, "file"], sep = ""))
   lines <- lines[lines != ""]
   match <- grep(".*HIV\\/AIDS Prevalence.*", lines)
   match.result <- lines[match + 1]
