@@ -30,7 +30,8 @@ plots <- function(z) {
     coord_flip() +
     guides(fill = FALSE) +
     geom_text(size = 3.5, hjust = -0.3) +
-    labs(y = "rate")
+    ylab("rate") +
+    theme(axis.text = element_text(colour = "black"))
 }
 ```
 
