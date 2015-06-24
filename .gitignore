@@ -5,3 +5,6 @@
 data/
 figs/
 *.html
+Thumbs.db
+*.pdf
+*/Thumbs.db
